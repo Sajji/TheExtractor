@@ -1,0 +1,12 @@
+{
+  "sourceSystem": {
+    "baseREST": "https://fedworld.collibra.com/rest/2.0/",
+    "baseGraphql": "https://fedworld.collibra.com/graphql/knowledgeGraph/v1",
+    "username": "Admin",
+    "password": "admin",
+    "communities": [
+      "HHS",
+      "OPM"
+    ]
+  }
+}
