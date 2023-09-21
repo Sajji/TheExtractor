@@ -23,6 +23,7 @@ async function fetchGraphQLData(domainId) {
     ) {
       id
       name: fullName
+      displayName: displayName
       type {
         id
         name
@@ -150,6 +151,7 @@ async function getGraphQLData(baseDirectory) {
         const assetData = {
           id: asset.id,
           name: asset.name,
+          displayName: asset.displayName,
           domainId: asset.domain.id,
           domainName: asset.domain.name,
           typeId: asset.type.id,
