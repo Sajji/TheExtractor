@@ -4,7 +4,10 @@ const readline = require('readline');
 const path = require('path');
 const config = require('../config.json');
 const getGraphQLData = require('./getGraphData');
+const getTypes = require('./getTypes');
 const fetchDomains = require('./fetchDomains');
+
+const suffix = config.sourceSystem.suffix;
 
 async function ensureDirectoryExistence(directoryPath) {
   try {
@@ -44,6 +47,7 @@ async function fetchCommunityChildren(parentId, communityData = []) {
       const mappings = {
         id: community.id,
         name: community.name,
+        newName: `${community.name} - ${suffix}`,
         parentId: community.parent.id,
         parentName: community.parent.name,
       };
@@ -61,7 +65,7 @@ async function fetchCommunityChildren(parentId, communityData = []) {
   }
 }
 
-async function getEverything() {
+async function getCommunitiesDomains() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -105,7 +109,8 @@ async function getEverything() {
       const community = responseData.results[0];
       const mappings = {
         id: community.id,
-        name: community.name
+        name: community.name,
+        newName: `${community.name} - ${suffix}`
       };
   
       if (community.description !== undefined) {
@@ -139,7 +144,9 @@ async function getEverything() {
   }
 
   rl.close();
-});
+  getTypes();
+  });
+
 }
 
-getEverything();
+getCommunitiesDomains();

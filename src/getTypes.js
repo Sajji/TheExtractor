@@ -2,8 +2,9 @@ const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
 
-async function fetchHousekeeping() {
+async function getTypes() {
   const config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+  const suffix = config.sourceSystem.suffix;
 
   try {
     const endpoints = [
@@ -28,6 +29,7 @@ async function fetchHousekeeping() {
 
 async function fetchData(endpoint, config) {
   try {
+    const suffix = config.sourceSystem.suffix;
     const sourceSystemConfig = config.sourceSystem;
     const baseREST = sourceSystemConfig.baseREST;
     const auth = {
@@ -62,6 +64,7 @@ async function fetchData(endpoint, config) {
       results = response.data.results.map(assetType => ({
         id: assetType.id,
         name: assetType.name,
+        newName: `${assetType.name} - ${suffix}`,
         description: assetType.description || '',
         parentId: assetType.parent.id,
         parentName: assetType.parent.name
@@ -76,6 +79,7 @@ async function fetchData(endpoint, config) {
       results = response.data.results.map(domainType => ({
         id: domainType.id,
         name: domainType.name,
+        newName: `${domainType.name} - ${suffix}`,
         description: domainType.description || '',
         parentId: domainType.parent.id,
         parentName: domainType.parent.name
@@ -100,8 +104,9 @@ async function fetchData(endpoint, config) {
 
       results = response.data.results.map(attributeType => {
         const { resourceType, ...rest } = attributeType;
+        const newName = `${attributeType.name} - ${suffix}`
         const kind = resourceTypeToKind[resourceType];
-        return { kind, ...rest };
+        return { kind, newName, ...rest };
       });
 
       console.log(`${endpoint}: Downloaded ${results.length}`);
@@ -119,9 +124,4 @@ async function fetchData(endpoint, config) {
     throw error;
   }
 }
-
-
-
-fetchHousekeeping();
-
-//module.exports = fetchHousekeeping;
+module.exports = getTypes;

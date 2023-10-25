@@ -1,8 +1,10 @@
 const axios = require('axios');
 const config = require('../config.json');
 
+
 async function fetchDomains(communityId) {
   const baseREST = config.sourceSystem.baseREST;
+  const suffix = config.sourceSystem.suffix;
   const endpoint = `${baseREST}domains?offset=0&limit=0&countLimit=-1&communityId=${communityId}&includeSubCommunities=true`;
 
   try {
@@ -20,6 +22,7 @@ async function fetchDomains(communityId) {
       const formattedDomain = {
         id: domain.id,
         name: domain.name,
+        newName: `${domain.name} - ${suffix}`,
         typeId: domain.type.id,
         typeName: domain.type.name,
         communityId: domain.community.id,
