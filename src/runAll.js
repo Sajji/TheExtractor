@@ -6,6 +6,8 @@ const config = require('../config.json');
 const getGraphQLData = require('./getGraphData');
 const getTypes = require('./getTypes');
 const fetchDomains = require('./fetchDomains');
+const generateSummary = require('./summary');  // Adjust './summary' if your file is located elsewhere.
+
 
 const suffix = config.sourceSystem.suffix;
 
@@ -139,6 +141,13 @@ async function getCommunitiesDomains() {
     await writeFileAsync(domainsFilePath, domainsData);
     console.log(`Domains data successfully saved to ${domainsFilePath}`);
     await getGraphQLData(baseDirectory);  // Pass baseDirectory here
+
+    const backupDataDirectory = path.resolve(baseDirectory); // if baseDirectory is your directory for JSON files
+    await generateSummary(backupDataDirectory);
+
+    console.log('Summary generation complete.');
+
+
   } catch (err) {
     console.error('Error while writing domains to file:', err);
   }
