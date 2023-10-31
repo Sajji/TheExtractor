@@ -51,7 +51,7 @@ async function fetchData(endpoint, config) {
         targetTypeName: relationType.targetType.name,
         role: relationType.role,
         coRole: relationType.coRole,
-        description: relationType.description || '',
+        description: relationType?.description,
         uniqueKey: `${relationType.sourceType.name}${relationType.targetType.name}${relationType.role}${relationType.coRole}`
       }));
 
@@ -65,7 +65,7 @@ async function fetchData(endpoint, config) {
         id: assetType.id,
         name: assetType.name,
         newName: `${assetType.name} - ${suffix}`,
-        description: assetType.description || '',
+        description: assetType?.description,
         parentId: assetType.parent.id,
         parentName: assetType.parent.name
       }));
@@ -80,7 +80,7 @@ async function fetchData(endpoint, config) {
         id: domainType.id,
         name: domainType.name,
         newName: `${domainType.name} - ${suffix}`,
-        description: domainType.description || '',
+        description: domainType?.description,
         parentId: domainType.parent.id,
         parentName: domainType.parent.name
       }));
@@ -106,7 +106,14 @@ async function fetchData(endpoint, config) {
         const { resourceType, ...rest } = attributeType;
         const newName = `${attributeType.name} - ${suffix}`
         const kind = resourceTypeToKind[resourceType];
-        return { kind, newName, ...rest };
+        const id = attributeType.id;
+        const name = attributeType.name;
+        const description = attributeType?.description;
+        const stringType = attributeType?.stringType;
+        const allowedValues = attributeType?.allowedValues;
+        const isInteger = attributeType?.isInteger;
+
+        return { kind, newName, id, name, description, stringType, allowedValues, isInteger };
       });
 
       console.log(`${endpoint}: Downloaded ${results.length}`);
