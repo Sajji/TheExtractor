@@ -130,11 +130,7 @@ async function fetchGraphQLData(domainId) {
 async function getGraphQLData(baseDirectory) {
   console.log(baseDirectory);
 
-    // Initialize unique sets
-    const uniqueAssets = new Set();
-    const uniqueAttributes = new Set();
-    const uniqueRelations = new Set();
-    const uniqueTags = new Set();
+
   
 
   try {
@@ -143,9 +139,16 @@ async function getGraphQLData(baseDirectory) {
     const rawData = await fsPromises.readFile(domainFilePath, 'utf8');
     const domainList = JSON.parse(rawData);
 
+
+
     for (const domain of domainList) {
       console.log(domain.name);
       const allData = [];
+      // Initialize unique sets
+      const uniqueAssets = new Set();
+      const uniqueAttributes = new Set();
+      const uniqueRelations = new Set();
+      const uniqueTags = new Set();
       const responseData = await fetchGraphQLData(domain.id);
       if (!responseData) {
         continue;
@@ -207,24 +210,40 @@ async function getGraphQLData(baseDirectory) {
       
       });
 
-      const domainDataPath = path.join(baseDirectory, `assets_${domain.name}.json`);
-      const allDataOutput = JSON.stringify(allData, null, 2);
-      fsSync.writeFileSync(domainDataPath, allDataOutput);
-      console.log(`Data saved to ${domainDataPath}. Total assets: ${allData.length}`);
+      const assetsDomainPath = path.join(baseDirectory, `assets_${domain.name}.json`);
+      const allAssetsOutput = JSON.stringify([...uniqueAssets].map(JSON.parse), null, 2);
+      fsSync.writeFileSync(assetsDomainPath, allAssetsOutput);
+
+      const attributesDomainPath = path.join(baseDirectory, `attributes_${domain.name}.json`);
+      const allAttributesOutput = JSON.stringify([...uniqueAttributes].map(JSON.parse), null, 2);
+      fsSync.writeFileSync(attributesDomainPath, allAttributesOutput);
+
+      const relationsDomainPath = path.join(baseDirectory, `relations_${domain.name}.json`);
+      const allRelationsOutput = JSON.stringify([...uniqueRelations].map(JSON.parse), null, 2);
+      fsSync.writeFileSync(relationsDomainPath, allRelationsOutput);
+
+      if (uniqueTags.size > 0) {
+      const tagsDomainPath = path.join(baseDirectory, `tags_${domain.name}.json`);
+      const allTagsOutput = JSON.stringify([...uniqueTags].map(JSON.parse), null, 2);
+      fsSync.writeFileSync(tagsDomainPath, allTagsOutput);
+      console.log(`Data saved to ${tagsDomainPath}. Total Tags: ${allTagsOutput.length}`);
+      }
+      else {
+        console.log(`No tags found for ${domain.name}`);
+      }
+      // console.log(`Data saved to ${assetsDomainPath}. Total assets: ${allData.length}`);
     }
         //Write unique attributes, relations, and tags to respective files
-        const assetsPath = path.join(baseDirectory, 'assets.json');
-        const attributesPath = path.join(baseDirectory, 'attributes.json');
-        const relationsPath = path.join(baseDirectory, 'relations.json');
-        const tagsPath = path.join(baseDirectory, 'tags.json');
+        // const assetsPath = path.join(baseDirectory, 'assets.json');
+        // const attributesPath = path.join(baseDirectory, 'attributes.json');
+        // const relationsPath = path.join(baseDirectory, 'relations.json');
+        // const tagsPath = path.join(baseDirectory, 'tags.json');
     
-        await fsPromises.writeFile(assetsPath, JSON.stringify([...uniqueAssets].map(JSON.parse), null, 2));
-        await fsPromises.writeFile(attributesPath, JSON.stringify([...uniqueAttributes].map(JSON.parse), null, 2));
-        await fsPromises.writeFile(relationsPath, JSON.stringify([...uniqueRelations].map(JSON.parse), null, 2));
-        await fsPromises.writeFile(tagsPath, JSON.stringify([...uniqueTags].map(JSON.parse), null, 2));
-        console.log(uniqueAttributes);
-        console.log(uniqueRelations);
-        console.log(uniqueTags);
+        // await fsPromises.writeFile(assetsPath, JSON.stringify([...uniqueAssets].map(JSON.parse), null, 2));
+        // await fsPromises.writeFile(attributesPath, JSON.stringify([...uniqueAttributes].map(JSON.parse), null, 2));
+        // await fsPromises.writeFile(relationsPath, JSON.stringify([...uniqueRelations].map(JSON.parse), null, 2));
+        // await fsPromises.writeFile(tagsPath, JSON.stringify([...uniqueTags].map(JSON.parse), null, 2));
+
   } catch (error) {
     console.error(error);
   }
