@@ -1,12 +1,9 @@
 const axios = require('axios');
-const fs = require('fs').promises;  // Note the ".promises"
+const fs = require('fs').promises;
 const path = require('path');
 const config = require('../config.json');
 const fsPromises = require('fs').promises;
 const fsSync = require('fs');
-
-// ... (rest of your code remains the same)
-
 
 const sourceSystem = config.sourceSystem;
 
@@ -133,10 +130,17 @@ async function fetchGraphQLData(domainId) {
 async function getGraphQLData(baseDirectory) {
   console.log(baseDirectory);
 
+    // Initialize unique sets
+    const uniqueAssets = new Set();
+    const uniqueAttributes = new Set();
+    const uniqueRelations = new Set();
+    const uniqueTags = new Set();
+  
+
   try {
     const domainFilePath = path.join(baseDirectory, 'domains.json');
     console.log("Attempting to load JSON from:", domainFilePath);
-    const rawData = await fsPromises.readFile(domainFilePath, 'utf8');  // Asynchronous read
+    const rawData = await fsPromises.readFile(domainFilePath, 'utf8');
     const domainList = JSON.parse(rawData);
 
     for (const domain of domainList) {
@@ -195,21 +199,35 @@ async function getGraphQLData(baseDirectory) {
           attributes,
           relations,
           tags: asset.tags,});
+
+          uniqueAssets.add(JSON.stringify(assetData));
+          attributes.forEach(attr => uniqueAttributes.add(JSON.stringify(attr)));
+          relations.forEach(rel => uniqueRelations.add(JSON.stringify(rel)));
+          asset.tags.forEach(tag => uniqueTags.add(JSON.stringify(tag)));
+      
       });
 
-      // Write the data to separate files for each domain
       const domainDataPath = path.join(baseDirectory, `assets_${domain.name}.json`);
-
       const allDataOutput = JSON.stringify(allData, null, 2);
-
-      fsSync.writeFileSync(domainDataPath, allDataOutput); // Synchronous write
-
+      fsSync.writeFileSync(domainDataPath, allDataOutput);
       console.log(`Data saved to ${domainDataPath}. Total assets: ${allData.length}`);
     }
+        //Write unique attributes, relations, and tags to respective files
+        const assetsPath = path.join(baseDirectory, 'assets.json');
+        const attributesPath = path.join(baseDirectory, 'attributes.json');
+        const relationsPath = path.join(baseDirectory, 'relations.json');
+        const tagsPath = path.join(baseDirectory, 'tags.json');
+    
+        await fsPromises.writeFile(assetsPath, JSON.stringify([...uniqueAssets].map(JSON.parse), null, 2));
+        await fsPromises.writeFile(attributesPath, JSON.stringify([...uniqueAttributes].map(JSON.parse), null, 2));
+        await fsPromises.writeFile(relationsPath, JSON.stringify([...uniqueRelations].map(JSON.parse), null, 2));
+        await fsPromises.writeFile(tagsPath, JSON.stringify([...uniqueTags].map(JSON.parse), null, 2));
+        console.log(uniqueAttributes);
+        console.log(uniqueRelations);
+        console.log(uniqueTags);
   } catch (error) {
     console.error(error);
   }
 }
 
 module.exports = getGraphQLData;
-

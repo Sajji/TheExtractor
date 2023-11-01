@@ -1,12 +1,12 @@
 {
   "sourceSystem": {
-    "baseREST": "https://fedworld.collibra.com/rest/2.0/",
-    "baseGraphql": "https://fedworld.collibra.com/graphql/knowledgeGraph/v1",
+    "baseREST": "https://federal.collibra.com/rest/2.0/",
+    "baseGraphql": "https://federal.collibra.com/graphql/knowledgeGraph/v1",
     "username": "SysAdmin",
-    "password": "gomer",
+    "password": "woffles",
     "communities": [
       "GIS Community"
     ],
-    "suffix": "fedworld"
+    "suffix": "WofflesGIS"
   }
 }
